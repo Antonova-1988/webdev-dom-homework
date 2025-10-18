@@ -61,15 +61,43 @@
         </div>
       </div>
     </div>
-    <div>
-      <p>gfluyfynjhhgyiuguyfyl</p>
-    </div>
   </body>
 
   <script>
     "use strict";
     // Код писать здесь
+    const name = document.querySelector(".add-form-name")
+    const text = document.querySelector(".add-form-text")
+    const button = document.querySelector(".add-form-button")
+    const comments = document.querySelector(".comments")
+    
+    button.addEventListener('click', () => {
+      if ((name.value.trim() === "" || text.value.trim() === "")) {
+      return;
+      };
+      const date = new Date();
+    
+      const newCommentHTML = 
+      `<div class= "comment"> 
+        <div class="comment-header">
+          <div> ${name.value}</div>
+          <div> ${date.toLocaleString()}</div>
+        </div>
+        <div class="comment-text">${text.value}</div>
+        <div class= "comment-footer">
+          <div class= "likes">
+            <span class="likes-counter">0</span>
+            <button class="like-button"></button>
+          </div>
+        </div>
+      </div>`
 
+      comments.insertAdjacentHTML('beforeend', newCommentHTML);
+      
+      name.value =""
+      text.value =""
+    });
+    
     console.log("It works!");
   </script>
 </html>
