@@ -87,70 +87,86 @@
     ]
 
     const renderComments = () => {
-      const commentHtml = commentsGroup.map((comment, index) => {
-      return `
-      <li class="comment">
-          <div class="comment-header">
-            <div>${comment.name}</div>
-            <div>${comment.date}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">${comment.commentText}</div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comment.likes}</span>
-              <button data-index="${index}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
+        const commentHtml = commentsGroup.map((comment, index) => {
+        return `
+        <li data-index="${index}" class="comment">
+            <div class="comment-header">
+              <div>${comment.name}</div>
+              <div>${comment.date}</div>
             </div>
-          </div>
-        </li>`
-    }).join("");
+            <div class="comment-body">
+              <div class="comment-text">${comment.commentText}</div>
+            </div>
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button data-index="${index}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
+              </div>
+            </div>
+          </li>`
+      }).join("");
 
-    commentsContainer.innerHTML = commentHtml;
-    likeButtonClick();
-    
-  }
-
-  const likeButtonClick = () => {
-  const likeButtons = document.querySelectorAll(".like-button");
-  
-  likeButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const index = parseInt(button.dataset.index, 10);
-      const comment = commentsGroup[index];
-
-      comment.likes = comment.isLiked ? comment.likes - 1 : comment.likes + 1;
-      comment.isLiked = !comment.isLiked;
-
-      renderComments(); 
-    });
-  });
-};
-
-  renderComments(); 
-
-  button.addEventListener("click", () => {
-    if (name.value.trim() === "" || text.value.trim() === "") {
-      return alert("Заполните все поля!");
+      commentsContainer.innerHTML = commentHtml;
+      
+      likeButtonClick();
+      
     }
-    commentsGroup.push({
-      name: name.value,
-      date: new Date().toLocaleString(),
-      commentText: text.value,
-      likes: 0,
-      isLiked: false,
-    });
 
-    name.value = "";
-    text.value = "";
-
-    renderComments();
-  })
-
+    const likeButtonClick = () => {
+      const likeButtons = document.querySelectorAll(".like-button");
   
+      likeButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const index = parseInt(button.dataset.index, 10);
+          const comment = commentsGroup[index];
+
+          comment.likes = comment.isLiked ? comment.likes - 1 : comment.likes + 1;
+          comment.isLiked = !comment.isLiked;
+
+          renderComments();
+          initCommentClickListener();
+        });
+      });
+    };
+
+    renderComments(); 
+
+    const initCommentClickListener =() => {
+      const commentElements = document.querySelectorAll(".comment");
+      for (const commentElement of commentElements){
+        commentElement.addEventListener("click", () => {
+          const commentIndex = commentElement.dataset.index;
+          const comment = commentsGroup[commentIndex];
+
+          text.value = `> ${comment.name} : ${comment.commentText}|\n\n`;
+          text.focus();
+        });
+      }; 
+    };
+    initCommentClickListener();
+
+    button.addEventListener("click", () => {
+      if (name.value.trim() === "" || text.value.trim() === "") {
+        return alert("Заполните все поля!");
+      }
+      commentsGroup.push({
+        name: name.value.replace("<", "&lt;").replace(">", "&gt;"),
+        date: new Date().toLocaleString(),
+        commentText: text.value.replace("<", "&lt;").replace(">", "&gt;"),
+        likes: 0,
+        isLiked: false,
+      });
+
+        name.value = "";
+        text.value = "";
+        
+        renderComments();
+        initCommentClickListener();
+    })
+    
     renderComments();
- 
+   
       
 
     console.log("It works!");
