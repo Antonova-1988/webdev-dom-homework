@@ -1,5 +1,5 @@
-import { commentsGroup } from './commentsGroup.js'
-import { renderComments } from './renderComments.js'
+import { postComment } from './api.js'
+import { comments, updateComments } from './commentsGroup.js'
 import { sanitizeHtml } from './sanitizeHtml.js'
 
 export const initLikeListeners = (renderComments) => {
@@ -9,7 +9,7 @@ export const initLikeListeners = (renderComments) => {
         likeButton.addEventListener('click', (event) => {
             event.stopPropagation()
             const index = likeButton.dataset.index
-            const comment = commentsGroup[index]
+            const comment = comments[index]
 
             comment.likes = comment.isLiked
                 ? comment.likes - 1
@@ -27,7 +27,7 @@ export const initReplyListener = () => {
     for (const commentElement of commentElements) {
         commentElement.addEventListener('click', () => {
             const commentIndex = commentElement.dataset.index
-            const comment = commentsGroup[commentIndex]
+            const comment = comments[commentIndex]
 
             textInput.value = `> ${comment.name} : ${comment.text}\n\n`
             textInput.focus()
@@ -44,21 +44,14 @@ export const initAddCommentListener = (renderComments) => {
         if (nameInput.value.trim() === '' || textInput.value.trim() === '') {
             return alert('Заполните все поля!')
         }
-
-        const newComment = {
-            name: sanitizeHtml(nameInput.value),
-            date: new Date().toLocaleString(),
-            text: sanitizeHtml(textInput.value),
-            likes: 0,
-            isLiked: false,
-        }
-
-        commentsGroup.push(newComment)
-
-        renderComments()
-
-        nameInput.value = ''
-        textInput.value = ''
+        postComment(
+            sanitizeHtml(textInput.value),
+            sanitizeHtml(nameInput.value),
+        ).then((data) => {
+            updateComments(data)
+            renderComments()
+            nameInput.value = ''
+            textInput.value = ''
+        })
     })
 }
-renderComments()
