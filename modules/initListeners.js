@@ -44,10 +44,17 @@ export const initAddCommentListener = (renderComments) => {
         if (nameInput.value.trim() === '' || textInput.value.trim() === '') {
             return alert('Заполните все поля!')
         }
+
+        document.querySelector('.form-loading').style.display = 'block'
+        document.querySelector('.add-form').style.display = 'none'
+
         postComment(
             sanitizeHtml(textInput.value),
             sanitizeHtml(nameInput.value),
         ).then((data) => {
+            document.querySelector('.form-loading').style.display = 'none'
+            document.querySelector('.add-form').style.display = 'flex'
+
             updateComments(data)
             renderComments()
             nameInput.value = ''
