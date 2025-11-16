@@ -1,11 +1,10 @@
 import { comments } from './commentsGroup.js'
-import { initLikeListeners } from './initListeners.js'
-import { initReplyListener } from './initListeners.js'
-
-const commentsContainer = document.querySelector('.comments')
+import { initLikeListeners, initReplyListener } from './initListeners.js'
 
 export const renderComments = () => {
-    const commentHtml = comments
+    const commentHtml = document.querySelector('.comments')
+
+    commentHtml.innerHTML = comments
         .map((comment, index) => {
             return `
     <li data-index="${index}" class="comment">
@@ -25,8 +24,6 @@ export const renderComments = () => {
       </li>`
         })
         .join('')
-
-    commentsContainer.innerHTML = commentHtml
 
     initLikeListeners(renderComments)
     initReplyListener()

@@ -2,15 +2,60 @@ import { postComment } from './api.js'
 import { comments, updateComments } from './commentsGroup.js'
 import { sanitizeHtml } from './sanitizeHtml.js'
 
+// export const initLikeListeners = (renderComments) => {
+//     const likeButtons = document.querySelectorAll('.like-button')
+
+//     for (const likeButton of likeButtons) {
+//         likeButton.addEventListener('click', (event) => {
+//             event.stopPropagation()
+//             const index = likeButton.dataset.index
+//             const comment = comments[index]
+
+//             comment.likes = comment.isLiked
+//                 ? comment.likes - 1
+//                 : comment.likes + 1
+//             comment.isLiked = !comment.isLiked
+
+//             renderComments()
+//         })
+//     }
+// }
+
+function delay(interval = 300) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve()
+        }, interval)
+    })
+}
+
 export const initLikeListeners = (renderComments) => {
     const likeButtons = document.querySelectorAll('.like-button')
 
     for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', (event) => {
+        likeButton.addEventListener('click', async (event) => {
             event.stopPropagation()
             const index = likeButton.dataset.index
             const comment = comments[index]
 
+            // Добавляем класс для анимации
+            likeButton.classList.add('-loading-like')
+
+            // Обработчик окончания анимации
+            const handleAnimationEnd = () => {
+                likeButton.classList.remove('-loading-like')
+                likeButton.removeEventListener(
+                    'animationend',
+                    handleAnimationEnd,
+                )
+            }
+
+            likeButton.addEventListener('animationend', handleAnimationEnd)
+
+            // Имитация задержки, чтобы было видно анимацию
+            await delay(300) // подходящее время задержки
+
+            // Обновляем лайки
             comment.likes = comment.isLiked
                 ? comment.likes - 1
                 : comment.likes + 1
@@ -44,10 +89,17 @@ export const initAddCommentListener = (renderComments) => {
         if (nameInput.value.trim() === '' || textInput.value.trim() === '') {
             return alert('Заполните все поля!')
         }
+
+        document.querySelector('.form-loading').style.display = 'block'
+        document.querySelector('.add-form').style.display = 'none'
+
         postComment(
             sanitizeHtml(textInput.value),
             sanitizeHtml(nameInput.value),
         ).then((data) => {
+            document.querySelector('.form-loading').style.display = 'none'
+            document.querySelector('.add-form').style.display = 'flex'
+
             updateComments(data)
             renderComments()
             nameInput.value = ''
