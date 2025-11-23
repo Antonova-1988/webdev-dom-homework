@@ -29,7 +29,7 @@ export const postComment = (text, name, retriers = maxRetriers) => {
         body: JSON.stringify({
             text,
             name,
-            forceError: false,
+            forceError: true,
         }),
     })
         .then((response) => {
@@ -41,7 +41,7 @@ export const postComment = (text, name, retriers = maxRetriers) => {
                         return new Promise((resolve) =>
                             setTimeout(resolve, 1000),
                         ).then(() => {
-                            return postComment(text, name, maxRetriers - 1)
+                            return postComment(text, name, retriers - 1)
                         })
                     } else {
                         throw new Error('Ошибка сервера')
@@ -59,12 +59,3 @@ export const postComment = (text, name, retriers = maxRetriers) => {
             return fetchComments()
         })
 }
-
-const handlePostClick = () => {
-    postComment(textInput.value, nameInput.value).catch((error) => {
-        if (error.message === 'Ошибка сервера') {
-            handlePostClick()
-        }
-    })
-}
-addButton.addEventListener('click', handlePostClick)
